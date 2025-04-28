@@ -13,6 +13,6 @@ namespace WebApplication1.Models.Schedules
         [Required]
         public string Content { get; set; }
         [Required]
-        public string ImageUrl { get; set; }
+        public byte[] Image { get; set; }
     }
 }

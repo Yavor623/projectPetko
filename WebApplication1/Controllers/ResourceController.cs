@@ -13,7 +13,7 @@ namespace WebApplication1.Controllers
         public ResourceController(ApplicationDbContext db) => _db = db;
         public IActionResult Index()
         {
-            var resources = _db.Resources.ToList();
+            var resources = _db.Resources.Include(a => a.Category).ToList();
             return View(resources);
         }
         [HttpGet]
@@ -37,26 +37,25 @@ namespace WebApplication1.Controllers
                 };
 
                 _db.Resources.Add(resource);
-                await _db.SaveChangesAsync();
-                ViewBag.CategoryId = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
+                _db.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(Index));
+            ViewBag.CategoryId = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
+            return View(model);
         }
         [HttpGet]
         public IActionResult Edit(int id)
         {
             ViewData["CategoryId"] = new SelectList(_db.Categories, "Id", "Name");
-            var theResource = _db.Resources.Find(id);
+            var theResource = _db.Resources.FirstOrDefault(a => a.Id == id);
             var resource = new EditResourceViewModel
             {
-                Id = theResource.Id,
                 Title = theResource.Title,
                 Description = theResource.Description,
                 Link = theResource.Link,
-                CategoryId = theResource.CategoryId,
-                Resource = theResource
+                CategoryId = theResource.CategoryId
             };
+            
             return View(resource);
         }
         [HttpPost]
@@ -64,9 +63,8 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-				var resource = _db.Resources.Find(id);
+                var resource = _db.Resources.FirstOrDefault(a => a.Id == id);
 
-				resource.Id = model.Id;
 				resource.Title = model.Title;
 				resource.Description = model.Description;
 				resource.Link = model.Link;
@@ -81,8 +79,9 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            ViewBag.Category = _db.Categories.Where(a => a.Id == id);
-            var theResource = _db.Resources.Find(id);
+            
+            var theResource = _db.Resources.FirstOrDefault(a => a.Id == id);
+            ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == theResource.CategoryId);
             var resource = new DeleteResourceViewModel
             {
                 Id = theResource.Id,
@@ -96,7 +95,7 @@ namespace WebApplication1.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var resource = _db.Resources.Find(id);
+            var resource = _db.Resources.FirstOrDefault(a => a.Id == id);
             if (resource != null)
             {
                 _db.Resources.Remove(resource);

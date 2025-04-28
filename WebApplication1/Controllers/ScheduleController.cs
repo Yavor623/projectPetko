@@ -9,8 +9,10 @@ namespace WebApplication1.Controllers
     public class ScheduleController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public ScheduleController(ApplicationDbContext db) => _db = db;
-
+        public ScheduleController(ApplicationDbContext db) 
+        {
+            _db = db; 
+        }
         public IActionResult Index()
         {
             var programs = _db.Schedules.ToList();
@@ -28,9 +30,16 @@ namespace WebApplication1.Controllers
                     Id = model.Id,
                     Title = model.Title,
                     Content = model.Content,
-                    ImageUrl = model.ImageUrl,
                     Summary = model.Summary
                 };
+                if (model.ImageFile != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await model.ImageFile.CopyToAsync(ms);
+                        schedule.Image = ms.ToArray();
+                    }
+                }
 
                 _db.Schedules.Add(schedule);
                 await _db.SaveChangesAsync();
@@ -41,15 +50,13 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var theSchedule = _db.Schedules.Find(id);
+            var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
             var schedule = new EditScheduleViewModel
             {
-                Id = theSchedule.Id,
-                ImageUrl = theSchedule.ImageUrl,
+                ByteImage = theSchedule.Image,
                 Summary = theSchedule.Summary,
                 Content = theSchedule.Content,
-                Title = theSchedule.Title,
-                Schedule = theSchedule
+                Title = theSchedule.Title
             };
             return View(schedule);
         }
@@ -58,13 +65,23 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-				var schedule = _db.Schedules.Find(id);
+				var schedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
 
-                schedule.Id = model.Id;
                 schedule.Title = model.Title;
                 schedule.Content = model.Content;
-                schedule.ImageUrl = model.ImageUrl;
                 schedule.Summary = model.Summary;
+                if (model.ImageFile != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await model.ImageFile.CopyToAsync(ms);
+                        schedule.Image = ms.ToArray();
+                    }
+                }
+                else
+                {
+                    schedule.Image = model.ByteImage;
+                }
                 _db.Schedules.Update(schedule);
                 await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -74,11 +91,11 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            var theSchedule = _db.Schedules.Find(id);
+            var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
             var schedule = new DeleteScheduleViewModel
             {
                 Id = theSchedule.Id,
-                ImageUrl = theSchedule.ImageUrl,
+                Image = theSchedule.Image,
                 Summary = theSchedule.Summary,
                 Content = theSchedule.Content,
                 Title = theSchedule.Title,
@@ -88,7 +105,7 @@ namespace WebApplication1.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var program = _db.Schedules.Find(id);
+            var program = _db.Schedules.FirstOrDefault(a => a.Id == id);
             if (program != null)
             {
                 _db.Schedules.Remove(program);

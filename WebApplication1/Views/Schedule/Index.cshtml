@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
+@{
+    ViewData["Title"] = "Програми";
+}
 <main>
  <h2 style="justify-self:center">Програми</h2>
  @if (User.IsInRole("Admin"))
@@ -14,24 +16,24 @@
  <th>Заглавие</th>
  <th>Резюме</th>
  <th>Съдържание</th>
- <th>Линк на снимката</th>
+ <th></th>
  <th></th>
  </thead>
  <tbody>
  @foreach (var offer in Model)
  {
      <tr>
-     <td>@offer.Title</td>
-     <td>@offer.Summary</td>
-     <td>@offer.Content</td>
-     <td>@offer.ImageUrl</td>
-     <td>
-     @if (User.IsInRole("Admin"))
-     {
-     <a asp-action="Delete" asp-route-id="@offer.Id" class="btn btn-danger">Delete</a>
-     <a asp-action="Edit" asp-route-id="@offer.Id" class="btn btn-primary">Edit</a>
-     }
-     </td>
+         <td><img src="data:image;base64,@(Convert.ToBase64String(offer.Image))" style="border-radius:1rem;max-width:250px;max-height:250px" /></td>
+         <td>@offer.Title</td>
+         <td>@offer.Summary</td>
+         <td>@offer.Content</td>
+         <td>
+         @if (User.IsInRole("Admin"))
+         {
+         <a asp-action="Delete" asp-route-id="@offer.Id" class="btn btn-danger">Delete</a>
+         <a asp-action="Edit" asp-route-id="@offer.Id" class="btn btn-primary">Edit</a>
+         }
+         </td>
      </tr>
 
  }

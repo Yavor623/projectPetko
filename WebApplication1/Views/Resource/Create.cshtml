@@ -1,26 +1,31 @@
 ﻿@model WebApplication1.Models.Resources.CreateResourceViewModel
+@{
+    ViewData["Title"] = "Създаване на ресурс";
+}
 <main>
     <form asp-action="Create" method="post">
         <div class="form-group">
-            <label asp-for="Title" class=""></label>
+            <label asp-for="Title" class="">Заглавие</label>
             <input asp-for="Title" class="form-control" />
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Description" class=""></label>
+            <label asp-for="Description" class="">Описание</label>
             <input asp-for="Description" class="form-control" />
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Link" class=""></label>
+            <label asp-for="Link" class="">Линк</label>
             <input asp-for="Link" class="form-control" />
             <span asp-validation-for="Link" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="CategoryId" class=""></label>
-            <select asp-for="CategoryId" class="form-select" asp-items="@ViewBag.CategoryId" />
+            <label asp-for="CategoryId" class="">Категория</label>
+            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                <option>Моля изберете категория</option>
+            </select>
         </div>
-        <button type="submit" class="btn btn-success">Запази</button>
+        <button type="submit" class="btn btn-primary">Готово</button>
     </form>
 </main>
 

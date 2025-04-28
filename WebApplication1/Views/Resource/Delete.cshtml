@@ -1,12 +1,19 @@
 ﻿@model WebApplication1.Models.Resources.DeleteResourceViewModel
-
+@{
+	ViewData["Title"] = "Изтриване на ресурс";
+	string chosenCategory ="";
+	foreach (var item in ViewBag.ChosenCategory)
+	{
+		chosenCategory = item.Name;
+	}
+}
 <form asp-action="Delete" typeof="post">
 
 	<h2>Сигурни ли сте, че искате да изтриете този ресурс?</h2>
 	<h5>Заглавие: @Model.Title</h5>
-	<h5>Резюме: @Model.Description</h5>
-	<h5>Съдържание: @Model.Link</h5>
-	<h5>Линк: @ViewBag.Category.Name</h5>
+	<h5>Описание: @Model.Description</h5>
+	<h5>Линк: @Model.Link</h5>
+	<h5>Категория: @chosenCategory</h5>
 
 	<button type="submit" asp-route-id="@Model.Id" class="btn btn-success" type="post">Да</button>
 	<a asp-action="Index" class="btn btn-danger">Не</a>
