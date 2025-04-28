@@ -1,0 +1,18 @@
+﻿@model WebApplication1.Models.Resources.DeleteResourceViewModel
+
+<form asp-action="Delete" typeof="post">
+
+	<h2>Сигурни ли сте, че искате да изтриете този ресурс?</h2>
+	<h5>Заглавие: @Model.Title</h5>
+	<h5>Резюме: @Model.Description</h5>
+	<h5>Съдържание: @Model.Link</h5>
+	<h5>Линк: @ViewBag.Category.Name</h5>
+
+	<button type="submit" asp-route-id="@Model.Id" class="btn btn-success" type="post">Да</button>
+	<a asp-action="Index" class="btn btn-danger">Не</a>
+</form>
+<style>
+	form {
+		margin: 3% 10% 0 10%;
+	}
+</style>

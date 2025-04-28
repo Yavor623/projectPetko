@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Resource>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<main>
+    <h2 style="justify-self:center">Ресурси</h2>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary plus">Create</a>
+    }
+    <table class="table">
+        <thead>
+        <th>Заглавие</th>
+        <th>Описание</th>
+        <th>Линк</th>
+        <th>Категория</th>
+        <th></th>
+        </thead>
+        <tbody>
+            @foreach (var offer in Model)
+            {
+                <tr>
+                    <td>@offer.Title</td>
+                    <td>@offer.Description</td>
+                    <td>@offer.Link</td>
+                    <td>@offer.Category.Name</td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@offer.Id" class="btn btn-danger">Delete</a>
+                            <a asp-action="Edit" asp-route-id="@offer.Id" class="btn btn-primary">Edit</a>
+                        }
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</main>
+
+<style>
+    .plus {
+        justify-self: center;
+    }
+
+    main {
+        margin: 0 5% 0 5%;
+    }
+</style>
+
