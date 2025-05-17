@@ -4,6 +4,7 @@ using WebApplication1.Data;
 using WebApplication1.Models.Resources;
 using WebApplication1.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication1.Controllers
 {
@@ -16,12 +17,14 @@ namespace WebApplication1.Controllers
             var resources = _db.Resources.Include(a => a.Category).ToList();
             return View(resources);
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_db.Categories, "Id", "Name");
             return View();
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateResourceViewModel model)
         {
@@ -43,6 +46,7 @@ namespace WebApplication1.Controllers
             ViewBag.CategoryId = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
             return View(model);
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -58,6 +62,7 @@ namespace WebApplication1.Controllers
             
             return View(resource);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id,EditResourceViewModel model)
         {
@@ -76,6 +81,7 @@ namespace WebApplication1.Controllers
             ViewBag.Categories = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -92,6 +98,7 @@ namespace WebApplication1.Controllers
             };
             return View(resource);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

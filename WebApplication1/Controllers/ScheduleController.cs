@@ -3,6 +3,7 @@ using WebApplication1.Data;
 using WebApplication1.Models.Schedules;
 using WebApplication1.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication1.Controllers
 {
@@ -18,8 +19,10 @@ namespace WebApplication1.Controllers
             var programs = _db.Schedules.ToList();
             return View(programs);
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create() => View();
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateScheduleViewModel model)
         {
@@ -47,12 +50,14 @@ namespace WebApplication1.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
             var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
             var schedule = new EditScheduleViewModel
             {
+                //Id = id,
                 ByteImage = theSchedule.Image,
                 Summary = theSchedule.Summary,
                 Content = theSchedule.Content,
@@ -60,6 +65,7 @@ namespace WebApplication1.Controllers
             };
             return View(schedule);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id, EditScheduleViewModel model)
         {
@@ -88,6 +94,7 @@ namespace WebApplication1.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -102,6 +109,7 @@ namespace WebApplication1.Controllers
             };
             return View(schedule);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
