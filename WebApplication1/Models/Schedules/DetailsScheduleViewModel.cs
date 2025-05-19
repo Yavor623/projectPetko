@@ -2,7 +2,7 @@
 
 namespace WebApplication1.Models.Schedules
 {
-    public class DeleteScheduleViewModel
+    public class DetailsScheduleViewModel
     {
         [Required]
         public int Id { get; set; }

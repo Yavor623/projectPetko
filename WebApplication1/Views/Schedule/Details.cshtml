@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@model WebApplication1.Models.Schedules.DetailsScheduleViewModel
+@{
+}
+<div id="everything">
+	<h2style ="justify-self:center">@ViewBag.Prescription</h2style>
+	<h2 style="justify-self:center">Детайли</h2>
+	<br />
+	<div style="display:grid;grid-template-columns:1fr 1fr">
+		<div>
+			<img src="data:image;base64,@(Convert.ToBase64String(Model.Image))" style="width:80%;height:80%;"/>
+		</div>
+		<div id="info">
+			<div style="width:10%;" >
+				<h3>@Model.Title</h3>
+			</div>
+			<div style="width:100%;grid-column:2/ span 1" id="addInfo">
+				<h4>Категория:</h4>
+				<p>@ViewBag.Category</p>
+				<br />
+				<h4>Резюме: </h4>
+				<p>@Model.Summary</p>
+				<br />
+				<h4>Съдържание: </h4>
+				<p>@Model.Content</p>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	#info div{
+		padding:3%;
+		margin-bottom:5%;
+	}
+
+	#everything{
+		margin:0 10% 0 10%;
+	}
+	img:hover{
+		border: 1px solid black;
+		border-radius: 7px;
+	}
+</style> 

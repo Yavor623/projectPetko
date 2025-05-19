@@ -15,14 +15,25 @@ namespace WebApplication1.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Resource> Resources { get; set; }
+        public DbSet<ApplicationUserSchedule> ApplicationUserSchedules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<ApplicationUserSchedule>()
+                .HasOne(a => a.Schedule)
+                .WithMany(a => a.ApplicationUserSchedules);
+            builder.Entity<ApplicationUserSchedule>()
+                .HasOne(a => a.ApplicationUser)
+                .WithMany(a => a.ApplicationUserSchedules);
             builder.Entity<Resource>()
                 .HasOne(a => a.Category)
                 .WithMany(a => a.Resources)
+                .HasForeignKey(a => a.CategoryId);
+            builder.Entity<Schedule>()
+                .HasOne(a => a.Category)
+                .WithMany(a => a.Schedules)
                 .HasForeignKey(a => a.CategoryId);
 
             builder.Entity<Category>().HasData(

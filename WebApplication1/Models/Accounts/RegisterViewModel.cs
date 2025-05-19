@@ -21,7 +21,5 @@ namespace WebApplication1.Models.Accounts
         [DataType(DataType.Password)]
         [Compare("Password",ErrorMessage = "Двете пароли не съвпадат!")]
         public string ConfirmPassword { get; set; }
-        [Required]
-        public int Age { get; set; }
     }
 }

@@ -4,24 +4,32 @@ using WebApplication1.Models.Schedules;
 using WebApplication1.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApplication1.Controllers
 {
     public class ScheduleController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public ScheduleController(ApplicationDbContext db) 
+        private readonly UserManager<ApplicationUser> _userManager;
+        public ScheduleController(ApplicationDbContext db, UserManager<ApplicationUser> userManager) 
         {
-            _db = db; 
+            _db = db;
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
-            var programs = _db.Schedules.ToList();
+            var programs = _db.Schedules.Include(a => a.Category).ToList();
             return View(programs);
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public IActionResult Create() => View();
+        public IActionResult Create() 
+        {
+            ViewData["CategoryId"] = new SelectList(_db.Categories, "Id", "Name");
+            return View();
+        } 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateScheduleViewModel model)
@@ -33,7 +41,8 @@ namespace WebApplication1.Controllers
                     Id = model.Id,
                     Title = model.Title,
                     Content = model.Content,
-                    Summary = model.Summary
+                    Summary = model.Summary,
+                    CategoryId = model.CategoryId
                 };
                 if (model.ImageFile != null)
                 {
@@ -46,6 +55,7 @@ namespace WebApplication1.Controllers
 
                 _db.Schedules.Add(schedule);
                 await _db.SaveChangesAsync();
+                ViewBag.CategoryId = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
@@ -54,6 +64,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            ViewData["CategoryId"] = new SelectList(_db.Categories, "Id", "Name");
             var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
             var schedule = new EditScheduleViewModel
             {
@@ -90,6 +101,7 @@ namespace WebApplication1.Controllers
                 }
                 _db.Schedules.Update(schedule);
                 await _db.SaveChangesAsync();
+                ViewBag.CategoryId = new SelectList(_db.Categories, "Id", "Name", model.CategoryId);
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
@@ -99,6 +111,7 @@ namespace WebApplication1.Controllers
         public IActionResult Delete(int id)
         {
             var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
+            ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == theSchedule.CategoryId);
             var schedule = new DeleteScheduleViewModel
             {
                 Id = theSchedule.Id,
@@ -106,6 +119,7 @@ namespace WebApplication1.Controllers
                 Summary = theSchedule.Summary,
                 Content = theSchedule.Content,
                 Title = theSchedule.Title,
+                CategoryId = theSchedule.CategoryId
             };
             return View(schedule);
         }
@@ -120,6 +134,61 @@ namespace WebApplication1.Controllers
                 await _db.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+        //[Authorize]
+        //[HttpGet]
+        //public IActionResult Add(int id)
+        //{
+        //    var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
+        //    ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == theSchedule.CategoryId);
+        //    var schedule = new DetailsScheduleViewModel
+        //    {
+        //        Id = theSchedule.Id,
+        //        Image = theSchedule.Image,
+        //        Summary = theSchedule.Summary,
+        //        Content = theSchedule.Content,
+        //        Title = theSchedule.Title,
+        //        CategoryId = theSchedule.CategoryId
+        //    };
+        //    return View(schedule);
+        //}
+        [Authorize]
+        [HttpPost, ActionName("Add")]
+        public async Task<IActionResult> AddConfirmed(int id)
+        {
+            var program = _db.ApplicationUserSchedules.Where(a => a.ApplicationUserId == _userManager.GetUserId(User));
+            var theSchedule = program.Where(a => a.ScheduleId == id);
+            if (theSchedule == null)
+            {
+                var addedSchedule = new ApplicationUserSchedule
+                {
+                    ScheduleId = id,
+                    ApplicationUserId = _userManager.GetUserId(User)
+                };
+                _db.ApplicationUserSchedules.Add(addedSchedule);
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        [Authorize]
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var currentSchedule = _db.Schedules.Find(id);
+            ViewBag.Category =
+                from category in _db.Categories
+                where category.Id == currentSchedule.CategoryId
+                select category.Name;
+            var schedule = new DetailsScheduleViewModel
+            {
+                Id = currentSchedule.Id,
+                Image = currentSchedule.Image,
+                Summary = currentSchedule.Summary,
+                Content = currentSchedule.Content,
+                Title = currentSchedule.Title,
+                CategoryId = currentSchedule.CategoryId
+            };
+            return View(schedule);
         }
     }
 }

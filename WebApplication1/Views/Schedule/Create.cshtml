@@ -22,6 +22,12 @@
         <div class="form-group">
             <input asp-for="ImageFile" class="form-control" accept="image/*" type="file" />
         </div>
+        <div class="form-group">
+            <label asp-for="CategoryId" class="">Категория</label>
+            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                <option>Моля изберете категория</option>
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">Готово</button>
     </form>
 </main>

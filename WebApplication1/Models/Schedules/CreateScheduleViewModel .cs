@@ -14,5 +14,7 @@ namespace WebApplication1.Models.Schedules
         public string Content { get; set; }
         [Required]
         public IFormFile ImageFile { get; set; }
+        [Required]
+        public int CategoryId { get; set; }
     }
 }

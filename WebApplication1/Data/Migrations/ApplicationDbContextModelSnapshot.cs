@@ -230,6 +230,30 @@ namespace WebApplication1.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.ApplicationUserSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("ApplicationUserSchedules");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -307,6 +331,9 @@ namespace WebApplication1.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -324,6 +351,8 @@ namespace WebApplication1.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Schedules");
                 });
@@ -379,6 +408,25 @@ namespace WebApplication1.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.ApplicationUserSchedule", b =>
+                {
+                    b.HasOne("WebApplication1.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserSchedules")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.Schedule", "Schedule")
+                        .WithMany("ApplicationUserSchedules")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Resource", b =>
                 {
                     b.HasOne("WebApplication1.Models.Category", "Category")
@@ -390,9 +438,32 @@ namespace WebApplication1.Data.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.Schedule", b =>
+                {
+                    b.HasOne("WebApplication1.Models.Category", "Category")
+                        .WithMany("Schedules")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("ApplicationUserSchedules");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.Category", b =>
                 {
                     b.Navigation("Resources");
+
+                    b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Schedule", b =>
+                {
+                    b.Navigation("ApplicationUserSchedules");
                 });
 #pragma warning restore 612, 618
         }

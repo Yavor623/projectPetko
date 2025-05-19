@@ -14,6 +14,8 @@ namespace WebApplication1.Models.Schedules
         [Display(Name = "Upload Image")]
         public byte[] ByteImage { get; set; }
         public IFormFile? ImageFile { get; set; }
+        [Required]
+        public int CategoryId { get; set; }
 
     }
 }
