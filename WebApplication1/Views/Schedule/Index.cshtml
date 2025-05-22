@@ -19,13 +19,15 @@
                 <div style="grid-column:1/span 1;width:80%;height:95%;">
                     <a asp-action="Details" asp-route-id="@offer.Id" asp-route-prescriptionMessage=""> <img src="data:image;base64,@(Convert.ToBase64String(offer.Image))" style="border-radius:1rem;max-width:250px;max-height:200px;min-width:300px;min-height:200px;object-fit:cover" /></a>
                 </div>
-                <div style="grid-column:2/span 1;width:80%;height:95%;margin-left:3%;">
+                <div style="grid-column:2/span 1;width:80%;height:95%;margin-left:5%;">
                     <h3>@offer.Title</h3>
                    
                     <p>@offer.Category.Name</p>
-                    
+                    <br />
                     <p>@offer.Summary</p>
                     <a asp-action="Add" asp-route-id="@offer.Id" class="btn btn-primary">Add</a>
+                    <br />
+                    <br />
                     @if (User.IsInRole("Admin"))
                     {
                         <a asp-action="Delete" asp-route-id="@offer.Id" class="btn btn-danger">Delete</a>

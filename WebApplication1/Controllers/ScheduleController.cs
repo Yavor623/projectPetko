@@ -72,7 +72,8 @@ namespace WebApplication1.Controllers
                 ByteImage = theSchedule.Image,
                 Summary = theSchedule.Summary,
                 Content = theSchedule.Content,
-                Title = theSchedule.Title
+                Title = theSchedule.Title,
+                CategoryId = theSchedule.CategoryId
             };
             return View(schedule);
         }
@@ -87,6 +88,7 @@ namespace WebApplication1.Controllers
                 schedule.Title = model.Title;
                 schedule.Content = model.Content;
                 schedule.Summary = model.Summary;
+                schedule.CategoryId = model.CategoryId;
                 if (model.ImageFile != null)
                 {
                     using (var ms = new MemoryStream())
@@ -135,30 +137,32 @@ namespace WebApplication1.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        //[Authorize]
-        //[HttpGet]
-        //public IActionResult Add(int id)
-        //{
-        //    var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
-        //    ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == theSchedule.CategoryId);
-        //    var schedule = new DetailsScheduleViewModel
-        //    {
-        //        Id = theSchedule.Id,
-        //        Image = theSchedule.Image,
-        //        Summary = theSchedule.Summary,
-        //        Content = theSchedule.Content,
-        //        Title = theSchedule.Title,
-        //        CategoryId = theSchedule.CategoryId
-        //    };
-        //    return View(schedule);
-        //}
+        [Authorize]
+        [HttpGet]
+        public IActionResult Add(int id)
+        {
+            var theSchedule = _db.Schedules.FirstOrDefault(a => a.Id == id);
+            ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == theSchedule.CategoryId);
+            var schedule = new DetailsScheduleViewModel
+            {
+                Id = theSchedule.Id,
+                Image = theSchedule.Image,
+                Summary = theSchedule.Summary,
+                Content = theSchedule.Content,
+                Title = theSchedule.Title,
+                CategoryId = theSchedule.CategoryId
+            };
+            return View(schedule);
+        }
         [Authorize]
         [HttpPost, ActionName("Add")]
         public async Task<IActionResult> AddConfirmed(int id)
         {
-            var program = _db.ApplicationUserSchedules.Where(a => a.ApplicationUserId == _userManager.GetUserId(User));
-            var theSchedule = program.Where(a => a.ScheduleId == id);
-            if (theSchedule == null)
+            var program = 
+                from schedule in _db.ApplicationUserSchedules
+                where schedule.ApplicationUserId == _userManager.GetUserId(User)
+                select schedule.ScheduleId;
+            if (!program.Contains(id))
             {
                 var addedSchedule = new ApplicationUserSchedule
                 {
@@ -168,17 +172,14 @@ namespace WebApplication1.Controllers
                 _db.ApplicationUserSchedules.Add(addedSchedule);
                 await _db.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Add));
         }
         [Authorize]
         [HttpGet]
         public IActionResult Details(int id)
         {
             var currentSchedule = _db.Schedules.Find(id);
-            ViewBag.Category =
-                from category in _db.Categories
-                where category.Id == currentSchedule.CategoryId
-                select category.Name;
+            ViewBag.Category = _db.Categories.FirstOrDefault(a => a.Id==currentSchedule.CategoryId);
             var schedule = new DetailsScheduleViewModel
             {
                 Id = currentSchedule.Id,
