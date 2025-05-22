@@ -1,0 +1,20 @@
+﻿@model WebApplication1.Models.PersonalSchedule.DeletePersonScheduleViewModel
+@{
+	ViewData["Title"] = "Изтриване на програма";
+}
+<form asp-action="Delete" typeof="post">
+	<h2>Сигурни ли сте, че искате да изтриете тази програма?</h2>
+	<h5>Заглавие: @Model.Title</h5>
+	<h5>Резюме: @Model.Summary</h5>
+	<h5>Съдържание: @Model.Content</h5>
+	<h5>Категория: @chosenCategory</h5>
+	<img src="data:image;base64,@(Convert.ToBase64String(Model.Image))" style="border-radius:1rem;max-width:250px;max-height:250px" />
+	<br />
+	<button type="submit" asp-route-id="@Model.Id" class="btn btn-success" type="post">Да</button>
+	<a asp-action="Index" class="btn btn-danger">Не</a>
+</form>
+<style>
+	form {
+		margin: 3% 10% 0 10%;
+	}
+</style>

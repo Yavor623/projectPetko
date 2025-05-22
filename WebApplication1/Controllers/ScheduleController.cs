@@ -161,18 +161,21 @@ namespace WebApplication1.Controllers
             var program = 
                 from schedule in _db.ApplicationUserSchedules
                 where schedule.ApplicationUserId == _userManager.GetUserId(User)
-                select schedule.ScheduleId;
-            if (!program.Contains(id))
+                select schedule;
+            foreach(var pr in program)
             {
-                var addedSchedule = new ApplicationUserSchedule
+                if(pr.Id != id)
                 {
-                    ScheduleId = id,
-                    ApplicationUserId = _userManager.GetUserId(User)
-                };
-                _db.ApplicationUserSchedules.Add(addedSchedule);
-                await _db.SaveChangesAsync();
+                    var addedSchedule = new ApplicationUserSchedule
+                    {
+                        ScheduleId = id,
+                        ApplicationUserId = _userManager.GetUserId(User)
+                    };
+                    _db.ApplicationUserSchedules.Add(addedSchedule);
+                    await _db.SaveChangesAsync();
+                }
             }
-            return RedirectToAction(nameof(Add));
+            return RedirectToAction(nameof(Index));
         }
         [Authorize]
         [HttpGet]
