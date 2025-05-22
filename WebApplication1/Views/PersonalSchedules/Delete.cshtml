@@ -1,6 +1,11 @@
 ﻿@model WebApplication1.Models.PersonalSchedule.DeletePersonScheduleViewModel
 @{
 	ViewData["Title"] = "Изтриване на програма";
+	string chosenCategory = "";
+	foreach (var item in ViewBag.ChosenCategory)
+	{
+		chosenCategory = item.Name;
+	}
 }
 <form asp-action="Delete" typeof="post">
 	<h2>Сигурни ли сте, че искате да изтриете тази програма?</h2>

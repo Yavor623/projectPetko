@@ -10,11 +10,11 @@ using WebApplication1.Models.Resources;
 
 namespace WebApplication1.Controllers
 {
-    public class PersonalSchedules : Controller
+    public class PersonalSchedulesController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
-        public PersonalSchedules(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+        public PersonalSchedulesController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _userManager = userManager;
@@ -25,20 +25,22 @@ namespace WebApplication1.Controllers
             var userSchedules = _db.ApplicationUserSchedules.Include(a => a.Schedule.Category).Include(a => a.ApplicationUser).Where(a => a.ApplicationUserId == _userManager.GetUserId(User)).ToList();
                 return View(userSchedules);
         }
-        [Authorize]
+
+		[Authorize]
         [HttpGet]
         public IActionResult Delete(int id)
         {
-
-            var thePersonalSchedule = _db.Schedules.Include(a => a.Category).FirstOrDefault(a => a.Id == id);
-            var personalSchedule = new DeletePersonScheduleViewModel
+            var thePersonalSchedule = _db.ApplicationUserSchedules.FirstOrDefault(a => a.Id == id);
+            var sch = _db.Schedules.FirstOrDefault(a => a.Id == thePersonalSchedule.ScheduleId);
+			ViewBag.ChosenCategory = _db.Categories.Where(a => a.Id == sch.CategoryId);
+			var personalSchedule = new DeletePersonScheduleViewModel
             {
 				Id = id,
-				Image = thePersonalSchedule.Image,
-				Summary = thePersonalSchedule.Summary,
-				Content = thePersonalSchedule.Content,
-				Title = thePersonalSchedule.Title,
-				CategoryId = thePersonalSchedule.CategoryId
+				Image = sch.Image,
+				Summary = sch.Summary,
+				Content = sch.Content,
+				Title = sch.Title,
+				CategoryId = sch.CategoryId
 			};
             return View(personalSchedule);
         }

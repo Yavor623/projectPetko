@@ -158,23 +158,35 @@ namespace WebApplication1.Controllers
         [HttpPost, ActionName("Add")]
         public async Task<IActionResult> AddConfirmed(int id)
         {
-            var program = 
-                from schedule in _db.ApplicationUserSchedules
-                where schedule.ApplicationUserId == _userManager.GetUserId(User)
-                select schedule;
-            foreach(var pr in program)
+            var program =  _db.ApplicationUserSchedules.Where(a=> a.ApplicationUserId == _userManager.GetUserId(User)).ToList();
+            if(program.Count == 0)
             {
-                if(pr.Id != id)
-                {
-                    var addedSchedule = new ApplicationUserSchedule
-                    {
-                        ScheduleId = id,
-                        ApplicationUserId = _userManager.GetUserId(User)
-                    };
-                    _db.ApplicationUserSchedules.Add(addedSchedule);
-                    await _db.SaveChangesAsync();
-                }
-            }
+				var addedSchedule = new ApplicationUserSchedule
+				{
+					ScheduleId = id,
+					ApplicationUserId = _userManager.GetUserId(User)
+				};
+				_db.ApplicationUserSchedules.Add(addedSchedule);
+				await _db.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
+			}
+            else
+            {
+				foreach (var pr in program)
+				{
+					if (pr.ScheduleId != id)
+					{
+						var addedSchedule = new ApplicationUserSchedule
+						{
+							ScheduleId = id,
+							ApplicationUserId = _userManager.GetUserId(User)
+						};
+						_db.ApplicationUserSchedules.Add(addedSchedule);
+						await _db.SaveChangesAsync();
+						return RedirectToAction(nameof(Index));
+					}
+				}
+			}
             return RedirectToAction(nameof(Index));
         }
         [Authorize]
